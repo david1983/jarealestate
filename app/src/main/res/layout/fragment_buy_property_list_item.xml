@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="95dp"
+            android:layout_height="81dp"
+            android:id="@+id/imageView2"
+            app:srcCompat="@drawable/coins" />
+
+
+        <LinearLayout
+            android:paddingLeft="10dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextView
+                android:text="dsadsa dsa d sa dsa dsa ds  dsa dsa dsa dsa"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18dp"
+                android:id="@+id/TxtTitle" />
+
+            <TextView
+                android:text="TextVdasdsadsadsadsa ds a dsa dsa d sa dsa ds ad sa dsa ds ad sa ds ads a ds d sa ds ds ad sa dsa dsa dsa aiew"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12dp"
+                android:id="@+id/TxtDescription"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</LinearLayout>
