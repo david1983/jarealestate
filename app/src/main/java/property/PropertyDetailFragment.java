@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import helpers.routedFragment;
+import jarealestate.RootActivity;
 import uk.co.davideandreazzini.jarealestate.R;
 
 /**
@@ -34,6 +35,8 @@ public class PropertyDetailFragment extends routedFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        RootActivity activity = (RootActivity) getActivity();
+        activity.setSharedContent(p.propertyTypeFullDescription, p.summary, p.bmp);
         img = (ImageView) getView().findViewById(R.id.propertyImage);
         title = (TextView) getView().findViewById(R.id.txtTitle);
         summary = (TextView) getView().findViewById(R.id.txtSummary);

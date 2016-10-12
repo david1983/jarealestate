@@ -1,5 +1,7 @@
 package property;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -137,7 +139,6 @@ public class PropertyListFragment extends routedFragment {
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
                 // ...
             }
-
         });
     }
 

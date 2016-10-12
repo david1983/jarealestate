@@ -1,14 +1,22 @@
 package jarealestate;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.provider.MediaStore;
+import android.provider.SyncStateContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -163,7 +171,7 @@ public class RootActivity extends FirebaseActivity
                         } else if (id == R.id.nav_logout) {
                             mAuth.signOut();
                         } else if (id == R.id.nav_share) {
-
+                          shareContent();
                         } else if (id == R.id.nav_send) {
 
                         }
@@ -175,6 +183,48 @@ public class RootActivity extends FirebaseActivity
             }
         }).start();
         return true;
+    }
+
+
+
+    private class sharingContent{
+        String subj, text;
+        Bitmap image;
+    }
+
+    sharingContent sContent;
+
+    public void setSharedContent(String subj, String text, Bitmap image){
+        sContent = new sharingContent();
+        sContent.subj = subj;
+        sContent.text = text;
+        sContent.image = image;
+    }
+
+
+    public void shareContent(){
+        if(sContent==null) return;
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        } else {
+
+            Intent i=new Intent(android.content.Intent.ACTION_SEND);
+            i.setType("*/*");
+            i.putExtra(android.content.Intent.EXTRA_SUBJECT,sContent.subj);
+            if(sContent.image!=null){
+
+                String path = MediaStore.Images.Media.insertImage(getContentResolver(), sContent.image, "Image I want to share", null);
+                Uri uri = Uri.parse(path);
+                i.putExtra(android.content.Intent.EXTRA_STREAM, uri);
+            }
+
+            i.putExtra(android.content.Intent.EXTRA_TEXT, sContent.text + "\n\nSent with JA Real Estate Android App ");
+            startActivity(Intent.createChooser(i,"Share via"));
+        }
+
     }
 
 }
