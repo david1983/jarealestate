@@ -1,17 +1,13 @@
-package FragmentHelpers;
+package helpers;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
+
+import uk.co.davideandreazzini.jarealestate.R;
 
 
 /**
@@ -25,15 +21,12 @@ public class routedFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
-
     }
 
     public void goTo(Fragment fragment, Boolean useBackStack){
         FragmentTransaction fragMan = getFragmentManager().beginTransaction()
-                .setCustomAnimations(uk.co.davideandreazzini.jarealestate.R.animator.slide_up,
-                        uk.co.davideandreazzini.jarealestate.R.animator.slide_down,
-                        uk.co.davideandreazzini.jarealestate.R.animator.slide_up,
-                        uk.co.davideandreazzini.jarealestate.R.animator.slide_down)
+                .setCustomAnimations(R.animator.enter_left, R.animator.exit_left,
+                        R.animator.exit_right, R.animator.enter_right)
                 .replace(uk.co.davideandreazzini.jarealestate.R.id.fragmentView, fragment);
                 if(useBackStack) fragMan.addToBackStack(null);
                 fragMan.commit();

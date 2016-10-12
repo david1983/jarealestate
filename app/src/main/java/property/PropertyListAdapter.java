@@ -46,7 +46,7 @@ public class PropertyListAdapter extends ArrayAdapter<Property> {
         if(prop.bmp!=null){
             imageView.setImageBitmap(prop.bmp);
         }else{
-            imageView.setImageResource(R.drawable.coins);
+            imageView.setImageResource(R.drawable.house);
         }
 
         // Return the completed view to render on screen

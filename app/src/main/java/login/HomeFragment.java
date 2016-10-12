@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import FragmentHelpers.routedFragment;
+import helpers.routedFragment;
 
 /**
  * Created by david on 04/10/2016.

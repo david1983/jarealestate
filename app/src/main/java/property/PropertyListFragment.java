@@ -2,30 +2,30 @@ package property;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import FragmentHelpers.routedFragment;
+import helpers.routedFragment;
 import uk.co.davideandreazzini.jarealestate.R;
 
 import static android.content.ContentValues.TAG;
@@ -36,10 +36,8 @@ public class PropertyListFragment extends routedFragment {
     ProgressBar mSpinner;
     TextView title;
     ListView listView;
-    protected loadAsync loadData;
-
-
-
+    Button loadMoreBtn;
+    String lastKey;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -47,21 +45,15 @@ public class PropertyListFragment extends routedFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        listView.setVisibility(View.INVISIBLE);
-        mSpinner.setVisibility(View.VISIBLE);
-    }
-
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        propArray = new ArrayList<Property>();
-        adapter = new PropertyListAdapter(getActivity(), propArray);
+        if(adapter==null){
+            propArray = new ArrayList<Property>();
+            adapter = new PropertyListAdapter(getActivity(), propArray);
+        }
 
-
-        listView = (ListView) getView().findViewById(R.id.buy_list);
+        loadMoreBtn = (Button) getView().findViewById(R.id.loadMoreBtn);
+        listView = (ListView) getView().findViewById(R.id.property_list);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -70,58 +62,89 @@ public class PropertyListFragment extends routedFragment {
                 goTo(detail, true);
             }
         });
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            private int preLast;
+                @Override
+                public void onScrollStateChanged(AbsListView view, int scrollState) {
+                    int i = listView.getScrollY();
+                    Log.i("i", "scrolly: " + i);
+                }
+
+            @Override
+            public void onScroll(AbsListView lw, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                switch(lw.getId())
+                {
+                    case R.id.property_list:
+
+                        // Make your calculation stuff here. You have all your
+                        // needed info from the parameters of this function.
+
+                        // Sample calculation to determine if the last
+                        // item is fully visible.
+                        final int lastItem = firstVisibleItem + visibleItemCount;
+
+
+                        if(lastItem == totalItemCount)
+                        {
+                            loadMoreBtn.setVisibility(View.VISIBLE);
+                            if(preLast!=lastItem)
+                            {
+                                //to avoid multiple calls for last item
+                                Log.d("Last", "Last");
+                                preLast = lastItem;
+
+                            }
+                        }
+                }
+            }
+        });
         title = (TextView) getView().findViewById(R.id.txtTitle);
         mSpinner = (ProgressBar) getView().findViewById(R.id.progressBar3);
         listView.setAdapter(adapter);
-        listView.setVisibility(View.INVISIBLE);
-        mSpinner.setVisibility(View.VISIBLE);
-        loadData = new loadAsync();
+        if(adapter.getCount()==0){
+            listView.setVisibility(View.INVISIBLE);
+            mSpinner.setVisibility(View.VISIBLE);
+        }else{
+            title.setText(adapter.getCount() + " properties");
+            listView.setVisibility(View.VISIBLE);
+            mSpinner.setVisibility(View.GONE);
+        }
+
 
     }
 
+    protected void loadData(Query m){
+        m.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
 
-
-    protected class loadAsync extends AsyncTask<Query, Void, Void >{
-
-        @Override
-        protected Void doInBackground(Query... params) {
-
-            params[0].addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    listView.setVisibility(View.INVISIBLE);
-                    mSpinner.setVisibility(View.VISIBLE);
-                    for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
-                        Property prop = snapshot.getValue(Property.class);
-                        prop.bmp = loadBitmap(prop.mainImageSrc);
-                        if(prop.bmp!=null){
-                            title.setText(adapter.getCount() + " properties");
-                            adapter.add(prop);
-                            listView.setVisibility(View.VISIBLE);
-                            mSpinner.setVisibility(View.GONE);
-                        }
-
-                    }
+                for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
+                    lastKey = snapshot.getKey();
+                    Property prop = snapshot.getValue(Property.class);
+                    prop.bmp = loadBitmap(prop.mainImageSrc);
+                    adapter.add(prop);
                 }
+                listView.setVisibility(View.VISIBLE);
+                mSpinner.setVisibility(View.GONE);
+                title.setText(adapter.getCount() + " properties");
+                loadMoreBtn.setVisibility(View.GONE);
+//                Toast.makeText(getActivity(), "Loaded 10 more properties",Toast.LENGTH_SHORT).show();
+            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    // Getting Post failed, log a message
-                    Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                    // ...
-                }
-            });
-            return null;
-        }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                // ...
+            }
 
+        });
     }
 
     public Bitmap loadBitmap(String path) {
         try{
-
             URL newurl = new URL(path);
             return BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
-
         }catch (IOException e) {
             return  null;
         }

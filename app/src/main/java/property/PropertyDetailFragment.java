@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import FragmentHelpers.routedFragment;
+import helpers.routedFragment;
 import uk.co.davideandreazzini.jarealestate.R;
 
 /**
