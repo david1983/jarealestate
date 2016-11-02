@@ -55,6 +55,9 @@ public class PropertyListFragment extends routedFragment {
         }
 
         loadMoreBtn = (Button) getView().findViewById(R.id.loadMoreBtn);
+        title = (TextView) getView().findViewById(R.id.txtTitle);
+        mSpinner = (ProgressBar) getView().findViewById(R.id.progressBar3);
+
         listView = (ListView) getView().findViewById(R.id.property_list);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -77,34 +80,22 @@ public class PropertyListFragment extends routedFragment {
                 switch(lw.getId())
                 {
                     case R.id.property_list:
-
-                        // Make your calculation stuff here. You have all your
-                        // needed info from the parameters of this function.
-
-                        // Sample calculation to determine if the last
-                        // item is fully visible.
                         final int lastItem = firstVisibleItem + visibleItemCount;
-
-
-                        if(lastItem == totalItemCount)
+                        if(lastItem == totalItemCount && adapter.getCount()>0)
                         {
                             loadMoreBtn.setVisibility(View.VISIBLE);
-                            if(preLast!=lastItem)
-                            {
-                                //to avoid multiple calls for last item
-                                Log.d("Last", "Last");
-                                preLast = lastItem;
-
-                            }
+                            if(preLast!=lastItem){ preLast = lastItem;}
+                        }else if(loadMoreBtn.getVisibility()==View.VISIBLE){
+                            loadMoreBtn.setVisibility(View.GONE);
                         }
                 }
             }
         });
-        title = (TextView) getView().findViewById(R.id.txtTitle);
-        mSpinner = (ProgressBar) getView().findViewById(R.id.progressBar3);
+
         listView.setAdapter(adapter);
         if(adapter.getCount()==0){
             listView.setVisibility(View.INVISIBLE);
+            loadMoreBtn.setVisibility(View.GONE);
             mSpinner.setVisibility(View.VISIBLE);
         }else{
             title.setText(adapter.getCount() + " properties");
